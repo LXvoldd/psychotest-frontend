@@ -1,16 +1,34 @@
-# React + Vite
+# 🧠 Psychotest Frontend (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Aplikasi Web Admin dan Portal Peserta untuk sistem Psikotes (DISC, MBTI, Kraepelin) berbasis React dan Vite. Terintegrasi dengan Backend Laravel milik Rangga.
 
-Currently, two official plugins are available:
+## 📸 Preview (Sementara)
+- **Login Page:** Role-based authentication (Admin / Candidate).
+- **Dashboard Admin:** Manajemen data kandidat, paket tes, dan hasil.
+- **Candidate Portal:** Halaman khusus peserta tes (dalam pengembangan).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🚀 Teknologi yang Digunakan
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React 18** (Library UI)
+- **Vite** (Build tool & Dev server super cepat)
+- **Tailwind CSS** (Styling responsif)
+- **React Router DOM v6** (Routing & Protected Route)
+- **Axios** (HTTP Client untuk komunikasi API)
+- **React Hook Form** (Manajemen form login & register)
+- **React Hot Toast** (Notifikasi interaktif)
+- **Lucide React** (Library ikon modern)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📁 Struktur Folder Utama
+
+```bash
+src/
+├── api/                # Konfigurasi Axios & Interceptor
+├── features/           # Fitur utama berdasarkan folder (Auth, Dashboard, Candidate)
+├── layout/             # Layout Global (MainLayout, CandidateLayout)
+├── routes/             # Routing (AppRoutes.jsx & Protected Route)
+├── services/           # Fungsi pemanggilan API (authService, dll)
+└── utils/              # Fungsi pembantu (opsional)
