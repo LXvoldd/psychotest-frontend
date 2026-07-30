@@ -8,7 +8,7 @@ const api = axios.create({
   },
 });
 
-// Interceptor untuk otomatis attach token ke header
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
