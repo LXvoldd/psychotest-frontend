@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import CandidateLayout from "../../layout/CandidateLayout";
 import api from "../../api/axiosConfig";
+import { logout } from "../../services/authService";
 
 export default function CandidateTest() {
   const { sessionId } = useParams();
@@ -17,11 +18,46 @@ export default function CandidateTest() {
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const [testPackage, setTestPackage] = useState(null);
 
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("role");
+        toast.success("Logout berhasil!");
+        navigate("/login");
+        return;
+      }
+
+      await logout();
+      
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("role");
+      toast.success("Logout berhasil!");
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      
+      if (error.response?.status === 401) {
+        toast.error("Sesi Anda telah berakhir, logout otomatis.");
+      } else {
+        toast.error("Gagal logout, tapi Anda tetap akan diarahkan ke login.");
+      }
+      
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("role");
+      navigate("/login");
+    }
+  };
+
   useEffect(() => {
     fetchQuestions();
   }, [sessionId]);
 
-  // Timer
   useEffect(() => {
     if (remainingSeconds <= 0) return;
 
@@ -54,7 +90,6 @@ export default function CandidateTest() {
       console.log("🔍 Fetching questions for session:", sessionId);
       console.log("🔑 Token:", token);
 
-      // GET /tests/sessions/{id}/questions
       const response = await api.get(`/tests/sessions/${sessionId}/questions`);
       console.log("✅ Response:", response.data);
 
@@ -109,12 +144,11 @@ export default function CandidateTest() {
     }
   };
 
-  // ===== UBAH BAGIAN INI =====
   const handleAutoSubmit = async () => {
     try {
       await api.post(`/tests/sessions/${sessionId}/submit`);
       toast.success("Tes otomatis dikumpulkan. Kembali ke dashboard.");
-      navigate("/candidate-dashboard"); // Diubah ke Dashboard
+      navigate("/candidate-dashboard");
     } catch (error) {
       console.error("Auto submit error:", error);
     }
@@ -160,7 +194,6 @@ export default function CandidateTest() {
     setCurrentQuestionIndex(index);
   };
 
-  // ===== UBAH BAGIAN INI JUGA =====
   const handleSubmit = async () => {
     const totalQuestions = questions.length;
     const answeredCount = Object.keys(answers).length;
@@ -181,7 +214,7 @@ export default function CandidateTest() {
       const response = await api.post(`/tests/sessions/${sessionId}/submit`);
       
       toast.success("Jawaban berhasil dikumpulkan!");
-      navigate("/candidate-dashboard"); // Diubah ke Dashboard
+      navigate("/candidate-dashboard");
       
     } catch (error) {
       console.error("Error submitting test:", error);
@@ -197,7 +230,6 @@ export default function CandidateTest() {
     return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
   };
 
-  // LOADING
   if (loading) {
     return (
       <CandidateLayout>

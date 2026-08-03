@@ -1,15 +1,19 @@
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: 'http://192.168.1.44:8000/api/v1',
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+console.log("🔒 [Private API] Mengirim ke:", BASE_URL);
+
+const privateApi = axios.create({
+  baseURL: BASE_URL,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
 });
 
-
-api.interceptors.request.use(
+privateApi.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -20,4 +24,19 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-export default api;
+privateApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('role');
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default privateApi;

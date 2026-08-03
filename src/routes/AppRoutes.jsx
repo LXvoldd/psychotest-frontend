@@ -4,9 +4,14 @@ import RegisterPage from "../features/auth/RegisterPage";
 import Dashboard from "../features/dashboard/Dashboard";
 import CandidateDashboard from "../features/candidate/CandidateDashboard";
 import CandidateList from "../features/candidate/CandidateList";
+import CandidateForm from "../features/candidate/CandidateForm";
 import TestList from "../features/tests/TestList";
+import TestForm from "../features/tests/TestForm";
 import ResultList from "../features/results/ResultList";
 import CandidateTest from "../features/candidate/CandidateTest";
+import TestPackageManager from "../features/admin/test-packages/TestPackageManager";
+import ResultsDashboard from "../features/admin/results/ResultsDashboard";
+import ResultDetail from "../features/admin/results/ResultDetail"; // ✅ TAMBAHAN IMPORT BARU
 
 const AdminRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -36,59 +41,27 @@ export default function AppRoutes() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        <Route
-          path="/dashboard"
-          element={
-            <AdminRoute>
-              <Dashboard />
-            </AdminRoute>
-          }
-        />
+        <Route path="/dashboard" element={<AdminRoute><Dashboard /></AdminRoute>} />
 
-        <Route
-          path="/candidates"
-          element={
-            <AdminRoute>
-              <CandidateList />
-            </AdminRoute>
-          }
-        />
+        <Route path="/candidates" element={<AdminRoute><CandidateList /></AdminRoute>} />
+        <Route path="/candidates/create" element={<AdminRoute><CandidateForm /></AdminRoute>} />
+        <Route path="/candidates/edit/:id" element={<AdminRoute><CandidateForm /></AdminRoute>} />
 
-        <Route
-          path="/tests"
-          element={
-            <AdminRoute>
-              <TestList />
-            </AdminRoute>
-          }
-        />
+        <Route path="/tests" element={<AdminRoute><TestList /></AdminRoute>} />
+        <Route path="/tests/create" element={<AdminRoute><TestForm /></AdminRoute>} />
+        <Route path="/tests/edit/:id" element={<AdminRoute><TestForm /></AdminRoute>} />
 
-        <Route
-          path="/results"
-          element={
-            <AdminRoute>
-              <ResultList />
-            </AdminRoute>
-          }
-        />
+        <Route path="/admin/test-packages" element={<AdminRoute><TestPackageManager /></AdminRoute>} />
+        <Route path="/admin/test-packages/create" element={<AdminRoute><TestForm /></AdminRoute>} />
+        <Route path="/admin/test-packages/edit/:id" element={<AdminRoute><TestForm /></AdminRoute>} />
 
-        <Route
-          path="/candidate-dashboard"
-          element={
-            <CandidateRoute>
-              <CandidateDashboard />
-            </CandidateRoute>
-          }
-        />
+        <Route path="/results" element={<AdminRoute><ResultsDashboard /></AdminRoute>} />
+        
+        {/* ✅ TAMBAHAN ROUTE DETAIL RESULTS */}
+        <Route path="/results/:id" element={<AdminRoute><ResultDetail /></AdminRoute>} />
 
-        <Route
-          path="/candidate/test/:sessionId"
-          element={
-            <CandidateRoute>
-              <CandidateTest />
-            </CandidateRoute>
-          }
-        />
+        <Route path="/candidate-dashboard" element={<CandidateRoute><CandidateDashboard /></CandidateRoute>} />
+        <Route path="/candidate/test/:sessionId" element={<CandidateRoute><CandidateTest /></CandidateRoute>} />
       </Routes>
     </BrowserRouter>
   );

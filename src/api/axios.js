@@ -1,21 +1,16 @@
-import axios from "axios";
+import axios from 'axios';
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+console.log("🌐 [Public API] Mengirim ke:", BASE_URL);
+
+const publicApi = axios.create({
+  baseURL: BASE_URL,
+  timeout: 30000,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
   },
 });
 
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
-
-export default api;
+export default publicApi;

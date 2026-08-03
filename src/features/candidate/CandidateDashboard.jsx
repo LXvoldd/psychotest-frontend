@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import CandidateLayout from "../../layout/CandidateLayout";
 import api from "../../api/axiosConfig";
+import { logout } from "../../services/authService";
 
 export default function CandidateDashboard() {
   const navigate = useNavigate();
@@ -35,34 +36,24 @@ export default function CandidateDashboard() {
         return;
       }
 
-      // ============================================
-      // PANGGIL API YANG TERSEDIA (SESUAI CONTRACT)
-      // ============================================
-      
-      // 1. GET /api/v1/tests - Ambil daftar tes
       const testsRes = await api.get("/tests");
       const tests = testsRes.data.data || [];
       setTestPackages(tests);
 
-      // 2. Ambil data user dari localStorage (sudah ada saat login)
       const userData = localStorage.getItem("user");
       if (userData) {
         setUser(JSON.parse(userData));
       }
 
-      // 3. Ambil sesi tes dari data tes (status dari test_packages)
-      //    Karena API contract tidak ada endpoint untuk session,
-      //    kita bisa gunakan data dari test_packages atau buat sendiri
       const sessions = tests.map(test => ({
         id: test.id,
         test_package_id: test.id,
-        status: test.status || "not_started", // available, in_progress, completed
+        status: test.status || "not_started",
         total_score: test.score || 0,
         submitted_at: test.completed_at || null,
       }));
       setTestSessions(sessions);
 
-      // 4. Hitung statistik
       const totalTests = tests.length;
       const completedTests = tests.filter(t => t.status === "completed").length;
       const inProgressTests = tests.filter(t => t.status === "in_progress").length;
@@ -103,9 +94,7 @@ export default function CandidateDashboard() {
 
   const handleStartTest = async (testPackageId) => {
     try {
-      // POST /api/v1/tests/{id}/start
       const response = await api.post(`/tests/${testPackageId}/start`);
-      
       toast.success("Tes dimulai! Selamat mengerjakan.");
       navigate(`/candidate/test/${response.data.data.session_id}`);
     } catch (error) {
@@ -118,9 +107,6 @@ export default function CandidateDashboard() {
     navigate(`/candidate/test/${sessionId}`);
   };
 
-  // ============================================
-  // FUNGSI 'LIHAT HASIL' DIHAPUS / DIALIHKAN
-  // ============================================
   const handleViewResult = () => {
     toast.info("Hasil tes tidak dapat diakses oleh Candidate. Kembali ke dashboard.");
     navigate("/candidate-dashboard");
@@ -128,7 +114,19 @@ export default function CandidateDashboard() {
 
   const handleLogout = async () => {
     try {
-      await api.post("/auth/logout");
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("role");
+        toast.success("Logout berhasil!");
+        navigate("/login");
+        return;
+      }
+
+      await logout();
+      
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem("role");
@@ -136,6 +134,15 @@ export default function CandidateDashboard() {
       navigate("/login");
     } catch (error) {
       console.error("Logout error:", error);
+      
+      if (error.response?.status === 401) {
+        toast.error("Sesi Anda telah berakhir, logout otomatis.");
+      } else if (error.code === "ECONNABORTED" || error.message?.includes("timeout")) {
+        toast.error("Koneksi timeout, tapi Anda tetap logout.");
+      } else {
+        toast.error("Gagal logout, tapi Anda tetap akan diarahkan ke login.");
+      }
+      
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem("role");
@@ -143,7 +150,6 @@ export default function CandidateDashboard() {
     }
   };
 
-  // LOADING STATE
   if (loading) {
     return (
       <CandidateLayout>
@@ -160,7 +166,6 @@ export default function CandidateDashboard() {
     );
   }
 
-  // ERROR STATE
   if (error) {
     return (
       <CandidateLayout>
@@ -181,7 +186,6 @@ export default function CandidateDashboard() {
     );
   }
 
-  // CEK SESI AKTIF
   const activeSession = testSessions.find(
     (session) => session.status === "in_progress"
   );
@@ -190,7 +194,6 @@ export default function CandidateDashboard() {
     <CandidateLayout>
       <div className="space-y-6">
 
-        {/* HEADER */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-slate-800">
@@ -208,7 +211,6 @@ export default function CandidateDashboard() {
           </button>
         </div>
 
-        {/* ACTIVE TEST SESSION */}
         {activeSession && (
           <div className="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-6">
             <div className="flex items-center justify-between">
@@ -230,7 +232,6 @@ export default function CandidateDashboard() {
           </div>
         )}
 
-        {/* STATS CARDS */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <p className="text-3xl font-bold text-blue-900">{stats.totalTests}</p>
@@ -250,10 +251,8 @@ export default function CandidateDashboard() {
           </div>
         </div>
 
-        {/* MAIN GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          {/* DAFTAR TES */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-slate-800">Daftar Tes Tersedia</h2>
@@ -284,11 +283,7 @@ export default function CandidateDashboard() {
                           )}
                         </div>
                       </div>
-                      {/* ============================================ */}
-                      {/* BAGIAN INI DIUBAH: TIDAK ADA TOMBOL APAPUN JIKA SUDAH SELESAI */}
-                      {/* ============================================ */}
                       {isCompleted ? (
-                        // Dikosongkan (null) agar tidak menampilkan tombol 'Tidak Tersedia'
                         null 
                       ) : isInProgress ? (
                         <button
@@ -316,7 +311,6 @@ export default function CandidateDashboard() {
             )}
           </div>
 
-          {/* RINGKASAN HASIL */}
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-slate-800">Riwayat Tes</h2>
 
@@ -340,9 +334,6 @@ export default function CandidateDashboard() {
                             {session.total_score}%
                           </span>
                         </div>
-                        {/* ============================================ */}
-                        {/* BAGIAN INI DIUBAH: TOMBOL 'LIHAT DETAIL' DIHAPUS */}
-                        {/* ============================================ */}
                         <p className="mt-1 text-xs text-gray-400 italic">
                           Detail hasil tidak tersedia untuk kandidat.
                         </p>

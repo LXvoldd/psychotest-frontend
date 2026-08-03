@@ -2,27 +2,22 @@ import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 
 export default function MainLayout({ children }) {
-
     return (
-
-        <div className="flex">
-
+        <div className="flex min-h-screen bg-gray-100">
+            
+            {/* Sidebar menggunakan posisi fixed di kiri */}
             <Sidebar />
 
-            <div className="flex-1">
-
+            {/* Konten utama digeser ke kanan selebar sidebar (w-64 = 16rem/256px) */}
+            <div className="flex-1 ml-64 flex flex-col min-h-screen">
+                
                 <Navbar />
 
-                <main className="p-8 bg-gray-100 min-h-screen">
-
+                <main className="flex-1 p-8">
                     {children}
-
                 </main>
 
             </div>
-
         </div>
-
     );
-
 }

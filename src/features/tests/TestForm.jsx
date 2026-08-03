@@ -1,105 +1,82 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import MainLayout from "../../layout/MainLayout";
+import TestPackageForm from "../admin/test-packages/components/TestPackageForm";
+import { useTestPackages } from "../admin/test-packages/hooks/useTestPackages";
+import LoadingSkeleton from "../shared/components/LoadingSkeleton";
+import toast from "react-hot-toast";
 
-export default function TestForm({ onSubmit }) {
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    duration: "",
-    passing_score: "",
-  });
+export default function TestForm() {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = !!id;
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const { createPackage, updatePackage, getPackage, loading } = useTestPackages();
+  const [initialData, setInitialData] = useState(null);
+  const [fetching, setFetching] = useState(isEdit);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (isEdit) {
+      const fetchData = async () => {
+        try {
+          const response = await getPackage(id);
+          setInitialData(response.data || response);
+        } catch (error) {
+          console.error("Error fetching package:", error);
+          toast.error("Gagal mengambil data paket tes");
+          navigate("/admin/test-packages");
+        } finally {
+          setFetching(false);
+        }
+      };
+      fetchData();
+    }
+  }, [id, isEdit]);
 
-    if (onSubmit) {
-      onSubmit(form);
-    } else {
-      console.log(form);
+  const handleSubmit = async (data) => {
+    setSubmitting(true);
+    try {
+      if (isEdit) {
+        await updatePackage(id, data);
+      } else {
+        await createPackage(data);
+      }
+      navigate("/admin/test-packages");
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
+  const handleCancel = () => {
+    navigate("/admin/test-packages");
+  };
+
+  if (fetching) {
+    return (
+      <MainLayout>
+        <div className="bg-white p-6 rounded-xl border border-gray-200">
+          <LoadingSkeleton type="form" />
+        </div>
+      </MainLayout>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow p-6 space-y-5">
-
-      <h2 className="text-2xl font-bold">
-        Create Test Package
-      </h2>
-
-      <div>
-        <label className="block mb-2 font-medium">
-          Test Name
-        </label>
-
-        <input
-          type="text"
-          name="title"
-          value={form.title}
-          onChange={handleChange}
-          className="w-full border rounded-lg p-3"
-          placeholder="DISC"
+    <MainLayout>
+      <div className="bg-white p-6 rounded-xl border border-gray-200">
+        <h2 className="text-lg font-semibold text-slate-800 mb-4">
+          {isEdit ? "Edit Paket Tes" : "Buat Paket Tes Baru"}
+        </h2>
+        <TestPackageForm
+          initialData={initialData}
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
+          isLoading={submitting || loading}
         />
       </div>
-
-      <div>
-        <label className="block mb-2 font-medium">
-          Description
-        </label>
-
-        <textarea
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          className="w-full border rounded-lg p-3"
-          rows="4"
-        />
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-5">
-
-        <div>
-          <label className="block mb-2 font-medium">
-            Duration (Minutes)
-          </label>
-
-          <input
-            type="number"
-            name="duration"
-            value={form.duration}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-3"
-          />
-        </div>
-
-        <div>
-          <label className="block mb-2 font-medium">
-            Passing Score
-          </label>
-
-          <input
-            type="number"
-            name="passing_score"
-            value={form.passing_score}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-3"
-          />
-        </div>
-
-      </div>
-
-      <button
-        type="submit"
-        className="bg-green-600 text-white px-5 py-3 rounded-lg hover:bg-green-700"
-      >
-        Save Test Package
-      </button>
-
-    </form>
+    </MainLayout>
   );
 }

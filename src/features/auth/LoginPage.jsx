@@ -15,9 +15,7 @@ export default function LoginPage() {
 
   const { register, handleSubmit } = useForm();
 
-  // ANIMASI MASUK
   useEffect(() => {
-    // Kasih delay kecil biar lebih halus
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 100);
@@ -31,22 +29,43 @@ export default function LoginPage() {
 
       const res = await login(data);
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      localStorage.setItem("role", selectedRole);
+      const responseData = res.data;
+      const token = responseData.data?.token || responseData.token;
+      const user = responseData.data?.user || responseData.user;
+
+      if (!token) {
+        toast.error("Token tidak ditemukan dalam response");
+        return;
+      }
+
+      if (!user) {
+        toast.error("Data user tidak ditemukan dalam response");
+        return;
+      }
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("role", user.role || selectedRole);
 
       toast.success(
-        `Login berhasil sebagai ${selectedRole === "admin" ? "Admin" : "Candidate"}!`
+        `Login berhasil sebagai ${user.role === "admin" ? "Admin" : "Candidate"}!`
       );
 
-      if (selectedRole === "admin") {
+      if (user.role === "admin") {
         navigate("/dashboard");
       } else {
         navigate("/candidate-dashboard");
       }
     } catch (err) {
       console.log(err);
-      toast.error(err?.response?.data?.message || "Email atau Password salah");
+      
+      if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
+        toast.error("Koneksi timeout. Cek apakah backend berjalan.");
+      } else if (err.response?.status === 401) {
+        toast.error("Email atau Password salah");
+      } else {
+        toast.error(err?.response?.data?.message || "Email atau Password salah");
+      }
     } finally {
       setLoading(false);
     }
@@ -55,7 +74,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex flex-col">
 
-      {/* HEADER - dengan animasi */}
       <header className={`flex items-center justify-between px-8 md:px-16 lg:px-24 py-6 md:py-8 flex-shrink-0 transition-all duration-700 transform ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5"
       }`}>
@@ -70,7 +88,6 @@ export default function LoginPage() {
         </Link>
       </header>
 
-      {/* MAIN CONTENT */}
       <div className="flex-1 flex items-center justify-center px-4 md:px-8 py-8 md:py-12">
         <div 
           className={`bg-white w-full max-w-4xl lg:max-w-5xl rounded-3xl border border-gray-200 shadow-2xl p-10 md:p-16 lg:p-20 transition-all duration-700 transform ${
@@ -79,7 +96,6 @@ export default function LoginPage() {
         >
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
             
-            {/* LEFT SIDE - WELCOME */}
             <div className="lg:col-span-2">
               <div className="h-full flex flex-col justify-center">
                 <div className="inline-block bg-blue-100 text-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4 w-fit">
@@ -101,10 +117,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* RIGHT SIDE - FORM */}
             <div className="lg:col-span-3">
 
-              {/* ROLE SELECTOR */}
               <div className="grid grid-cols-2 gap-4">
                 <button
                   type="button"
@@ -132,7 +146,6 @@ export default function LoginPage() {
 
               <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
 
-                {/* EMAIL */}
                 <div>
                   <label className="block text-base md:text-lg font-semibold text-gray-700 mb-2">
                     Email Address
@@ -145,7 +158,6 @@ export default function LoginPage() {
                   />
                 </div>
 
-                {/* PASSWORD */}
                 <div>
                   <div className="flex justify-between mb-2">
                     <label className="text-base md:text-lg font-semibold text-gray-700">
@@ -170,7 +182,6 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                {/* REMEMBER ME */}
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-3 text-sm md:text-base text-gray-600 cursor-pointer">
                     <input 
@@ -181,7 +192,6 @@ export default function LoginPage() {
                   </label>
                 </div>
 
-                {/* LOGIN BUTTON */}
                 <button
                   type="submit"
                   disabled={loading}
@@ -202,7 +212,6 @@ export default function LoginPage() {
 
               </form>
 
-              {/* REGISTER LINK */}
               <p className="text-center mt-6 text-base md:text-lg text-gray-600">
                 New user?{" "}
                 <Link
@@ -216,7 +225,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* FOOTER LINKS */}
           <div className={`flex flex-wrap justify-center gap-6 md:gap-8 text-sm md:text-base text-gray-400 mt-10 pt-8 border-t border-gray-100 transition-all duration-700 delay-200 ${
             isVisible ? "opacity-100" : "opacity-0"
           }`}>
