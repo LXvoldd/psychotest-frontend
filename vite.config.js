@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://recreational-crown-called-beaches.trycloudflare.com',
+        target: 'https://main-scientist-moreover-subscribers.trycloudflare.com/api/v1',
         changeOrigin: true,
       }
     }

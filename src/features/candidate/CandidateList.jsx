@@ -10,7 +10,7 @@ export default function CandidateList() {
     const fetchCandidates = async () => {
       try {
         setIsLoading(true);
-        // Mengambil data dari endpoint results yang sudah ada
+        
         const response = await api.get("/admin/results");
         const rawData = response.data.data || response.data;
         

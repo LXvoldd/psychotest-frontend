@@ -47,7 +47,7 @@ export default function TestList() {
           <EmptyState
             title="Belum Ada Paket Tes"
             description="Mulai buat paket tes pertama untuk kandidat."
-            icon="📝"
+            icon=""
             actionText="Buat Paket Tes"
             onAction={handleCreate}
           />
@@ -64,8 +64,8 @@ export default function TestList() {
                     <p className="text-gray-500 text-sm mt-1">{pkg.description}</p>
                     <div className="flex flex-wrap gap-4 mt-2 text-sm">
                       <span className="text-gray-400">⏱ {pkg.duration_minutes} Menit</span>
-                      <span className="text-gray-400">🎯 Passing: {pkg.passing_score}%</span>
-                      <span className="text-gray-400">📊 {pkg.questions?.length || 0} Soal</span>
+                      <span className="text-gray-400"> Passing: {pkg.passing_score}%</span>
+                      <span className="text-gray-400"> {pkg.questions?.length || 0} Soal</span>
                     </div>
                   </div>
 
@@ -81,7 +81,7 @@ export default function TestList() {
                       disabled={deletingId === pkg.id}
                       className="px-3 py-1 text-sm text-red-500 hover:text-red-700 transition disabled:opacity-50"
                     >
-                      {deletingId === pkg.id ? "⏳" : "Hapus"}
+                      {deletingId === pkg.id ? "" : "Hapus"}
                     </button>
                   </div>
                 </div>

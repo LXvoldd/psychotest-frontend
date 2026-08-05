@@ -11,7 +11,6 @@ export default function CandidateDashboard() {
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
   const [testPackages, setTestPackages] = useState([]);
-  const [testSessions, setTestSessions] = useState([]);
   const [stats, setStats] = useState({
     totalTests: 0,
     completedTests: 0,
@@ -45,18 +44,10 @@ export default function CandidateDashboard() {
         setUser(JSON.parse(userData));
       }
 
-      const sessions = tests.map(test => ({
-        id: test.id,
-        test_package_id: test.id,
-        status: test.status || "not_started",
-        total_score: test.score || 0,
-        submitted_at: test.completed_at || null,
-      }));
-      setTestSessions(sessions);
-
       const totalTests = tests.length;
       const completedTests = tests.filter(t => t.status === "completed").length;
       const inProgressTests = tests.filter(t => t.status === "in_progress").length;
+      
       const completedScores = tests
         .filter(t => t.status === "completed")
         .map(t => t.score || 0);
@@ -95,16 +86,22 @@ export default function CandidateDashboard() {
   const handleStartTest = async (testPackageId) => {
     try {
       const response = await api.post(`/tests/${testPackageId}/start`);
+      const { session_id } = response.data.data;
+      
       toast.success("Tes dimulai! Selamat mengerjakan.");
-      navigate(`/candidate/test/${response.data.data.session_id}`);
+      navigate(`/candidate/test/${session_id}`);
     } catch (error) {
       console.error("Error starting test:", error);
       toast.error(error.response?.data?.message || "Gagal memulai tes");
     }
   };
 
-  const handleContinueTest = (sessionId) => {
-    navigate(`/candidate/test/${sessionId}`);
+  const handleContinueTest = (lastSessionId) => {
+    if (!lastSessionId) {
+      toast.error("Tidak ada sesi aktif untuk dilanjutkan.");
+      return;
+    }
+    navigate(`/candidate/test/${lastSessionId}`);
   };
 
   const handleViewResult = () => {
@@ -186,8 +183,8 @@ export default function CandidateDashboard() {
     );
   }
 
-  const activeSession = testSessions.find(
-    (session) => session.status === "in_progress"
+  const activeTest = testPackages.find(
+    (test) => test.status === "in_progress"
   );
 
   return (
@@ -211,19 +208,19 @@ export default function CandidateDashboard() {
           </button>
         </div>
 
-        {activeSession && (
+        {activeTest && (
           <div className="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-6">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-yellow-800">
-                  ⏳ Tes Sedang Berjalan
+                   Tes Sedang Berjalan
                 </h3>
                 <p className="text-yellow-700 text-sm mt-1">
                   Anda memiliki tes yang belum selesai. Lanjutkan mengerjakan!
                 </p>
               </div>
               <button
-                onClick={() => handleContinueTest(activeSession.id)}
+                onClick={() => handleContinueTest(activeTest.last_session_id)}
                 className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition font-semibold"
               >
                 Lanjutkan Tes
@@ -232,7 +229,7 @@ export default function CandidateDashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <p className="text-3xl font-bold text-blue-900">{stats.totalTests}</p>
             <p className="text-gray-500 text-sm">Total Tes</p>
@@ -245,10 +242,6 @@ export default function CandidateDashboard() {
             <p className="text-3xl font-bold text-orange-500">{stats.inProgressTests}</p>
             <p className="text-gray-500 text-sm">Sedang Berjalan</p>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <p className="text-3xl font-bold text-purple-600">{stats.averageScore}%</p>
-            <p className="text-gray-500 text-sm">Rata-rata Nilai</p>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -259,12 +252,9 @@ export default function CandidateDashboard() {
             </div>
 
             {testPackages.length > 0 ? (
-              testPackages.map((test) => {
-                const existingSession = testSessions.find(
-                  (session) => session.test_package_id === test.id
-                );
-                const isCompleted = existingSession?.status === "completed";
-                const isInProgress = existingSession?.status === "in_progress";
+              testPackages.slice(0, 4).map((test) => { // <--- TAMBAHKAN .slice(0, 4) DI SINI
+                const isCompleted = test.status === "completed";
+                const isInProgress = test.status === "in_progress";
 
                 return (
                   <div key={test.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -274,12 +264,11 @@ export default function CandidateDashboard() {
                         <p className="text-gray-500 text-sm mt-1">{test.description}</p>
                         <div className="flex items-center gap-4 mt-3">
                           <span className="text-sm text-gray-400">⏱ {test.duration_minutes} Menit</span>
-                          <span className="text-sm text-gray-400">🎯 Passing Score: {test.passing_score}%</span>
                           {isCompleted && (
-                            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">✅ Selesai</span>
+                            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full"> Selesai</span>
                           )}
                           {isInProgress && (
-                            <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">⏳ Sedang Berjalan</span>
+                            <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full"> Sedang Berjalan</span>
                           )}
                         </div>
                       </div>
@@ -287,7 +276,7 @@ export default function CandidateDashboard() {
                         null 
                       ) : isInProgress ? (
                         <button
-                          onClick={() => handleContinueTest(existingSession.id)}
+                          onClick={() => handleContinueTest(test.last_session_id)}
                           className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition font-semibold text-sm"
                         >
                           Lanjutkan
@@ -309,34 +298,41 @@ export default function CandidateDashboard() {
                 <p className="text-gray-500">Belum ada tes yang tersedia.</p>
               </div>
             )}
+            
+            {/* Tambahkan tombol "Lihat Semua" jika tes lebih dari 4 */}
+            {testPackages.length > 4 && (
+              <div className="flex justify-center mt-4">
+                <button
+                  onClick={() => navigate("/candidate/assignments")}
+                  className="px-6 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition font-semibold text-sm"
+                >
+                  Lihat Semua di My Assignments
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-slate-800">Riwayat Tes</h2>
 
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              {testSessions.filter(s => s.status === "completed").length > 0 ? (
-                testSessions
-                  .filter((session) => session.status === "completed")
+              {testPackages.filter(t => t.status === "completed").length > 0 ? (
+                testPackages
+                  .filter((test) => test.status === "completed")
                   .slice(0, 5)
-                  .map((session) => {
-                    const test = testPackages.find(t => t.id === session.test_package_id);
+                  .map((test) => {
                     return (
-                      <div key={session.id} className="py-3 border-b border-gray-100 last:border-0">
-                        <p className="font-medium text-slate-700 text-sm">
-                          {test?.title || "Tes"}
-                        </p>
-                        <div className="flex items-center justify-between mt-1">
-                          <p className="text-xs text-gray-400">
-                            {session.submitted_at ? new Date(session.submitted_at).toLocaleDateString('id-ID') : '-'}
-                          </p>
-                          <span className="text-sm font-semibold text-blue-900">
-                            {session.total_score}%
-                          </span>
+                      <div key={test.id} className="py-3 border-b border-gray-100 last:border-0">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+                          <div>
+                            <p className="font-medium text-slate-700 text-sm">
+                              {test.title || "Tes"}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {test.completed_at ? new Date(test.completed_at).toLocaleDateString('id-ID') : '-'}
+                            </p>
+                          </div>
                         </div>
-                        <p className="mt-1 text-xs text-gray-400 italic">
-                          Detail hasil tidak tersedia untuk kandidat.
-                        </p>
                       </div>
                     );
                   })

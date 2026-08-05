@@ -10,7 +10,7 @@ export default function Dashboard() {
     questions: 0,
     students: 0
   });
-  const [recentResults, setRecentResults] = useState([]); // Untuk tabel dashboard
+  const [recentResults, setRecentResults] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -33,17 +33,19 @@ export default function Dashboard() {
           return;
         }
 
-        // 1. Ambil Statistik Dashboard (Kartu Angka)
-        const dashboardRes = await api.get("/admin/dashboard");
+        // 1. Ambil Statistik Dashboard dari API
+        const dashboardRes = await api.get("/admin/results");
         const dashboardData = dashboardRes.data.data || dashboardRes.data;
+        
+        // PERBAIKAN: Ambil dari object 'summary' sesuai API terbaru
+        const summary = dashboardData.summary || {};
         setStats({
-          tests: dashboardData.tests_completed || dashboardData.total_tests || 0,
-          questions: dashboardData.total_questions || 0,
-          students: dashboardData.total_candidates || 0
+          tests: summary.tests_in_progress || 0,
+          questions: summary.total_questions || 0,
+          students: summary.total_candidates || 0
         });
 
         // 2. Ambil Data Results (Untuk Tabel Latest Test Results)
-        // Kita gunakan endpoint /admin/results yang sudah terbukti berhasil datanya
         const resultsRes = await api.get("/admin/results");
         const rawData = resultsRes.data.data || resultsRes.data;
         
@@ -55,7 +57,7 @@ export default function Dashboard() {
             resultsArray = rawData;
           }
         }
-        setRecentResults(resultsArray); // Simpan semua data results
+        setRecentResults(resultsArray);
 
       } catch (error) {
         console.error("❌ Gagal mengambil data dashboard:", error);
@@ -79,7 +81,6 @@ export default function Dashboard() {
 
   return (
     <MainLayout>
-      {/* Header & Search */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div className="w-full md:w-1/2 relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -105,7 +106,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Top Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <div>
@@ -138,10 +138,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* 2 Columns layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Left Box: Latest Test Results */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col">
           <div className="p-6 border-b border-gray-100">
             <h3 className="font-bold text-lg text-slate-800">Latest Test Results</h3>
@@ -198,7 +196,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Right Box: Student Data */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col h-full">
           <div className="p-6 border-b border-gray-100">
             <h3 className="font-bold text-lg text-slate-800">Student Data</h3>
@@ -211,7 +208,7 @@ export default function Dashboard() {
               </div>
             ) : (
               recentResults.slice(0, 5).map((student) => {
-                // Tentukan warna badge berdasarkan status
+                
                 let statusColor = "bg-gray-100 text-gray-500";
                 let statusLabel = "NOT STARTED";
                 

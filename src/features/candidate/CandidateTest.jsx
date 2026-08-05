@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import CandidateLayout from "../../layout/CandidateLayout";
 import api from "../../api/axiosConfig";
-import { logout } from "../../services/authService";
 
 export default function CandidateTest() {
   const { sessionId } = useParams();
@@ -18,44 +17,8 @@ export default function CandidateTest() {
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const [testPackage, setTestPackage] = useState(null);
 
-  const handleLogout = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      
-      if (!token) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("role");
-        toast.success("Logout berhasil!");
-        navigate("/login");
-        return;
-      }
-
-      await logout();
-      
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("role");
-      toast.success("Logout berhasil!");
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout error:", error);
-      
-      if (error.response?.status === 401) {
-        toast.error("Sesi Anda telah berakhir, logout otomatis.");
-      } else {
-        toast.error("Gagal logout, tapi Anda tetap akan diarahkan ke login.");
-      }
-      
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("role");
-      navigate("/login");
-    }
-  };
-
   useEffect(() => {
-    fetchQuestions();
+    checkSessionStatus();
   }, [sessionId]);
 
   useEffect(() => {
@@ -76,7 +39,7 @@ export default function CandidateTest() {
     return () => clearInterval(interval);
   }, [remainingSeconds]);
 
-  const fetchQuestions = async () => {
+  const checkSessionStatus = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
@@ -87,17 +50,44 @@ export default function CandidateTest() {
         return;
       }
 
-      console.log("🔍 Fetching questions for session:", sessionId);
-      console.log("🔑 Token:", token);
+      const statusRes = await api.get(`/tests/sessions/${sessionId}/status`);
+      const statusData = statusRes.data.data;
 
+      if (statusData.status === "completed" || statusData.status === "expired") {
+        toast("Tes ini sudah selesai atau kadaluarsa."); // PERBAIKAN 1
+        navigate("/candidate-dashboard");
+        return;
+      }
+
+      setRemainingSeconds(statusData.remaining_seconds || 0);
+      
+      await fetchQuestions();
+
+    } catch (error) {
+      console.error("Error checking status:", error);
+      
+      if (error.response?.status === 404) {
+        toast.error(`Sesi ID ${sessionId} tidak ditemukan / sudah tidak aktif. Silakan mulai tes baru.`);
+        setTimeout(() => navigate("/candidate-dashboard"), 2000);
+      } else if (error.response?.status === 401) {
+        toast.error("Sesi Anda habis, silakan login kembali.");
+        localStorage.removeItem("token");
+        navigate("/login");
+      } else {
+        toast.error("Gagal memuat status sesi");
+      }
+    }
+  };
+
+  const fetchQuestions = async () => {
+    try {
       const response = await api.get(`/tests/sessions/${sessionId}/questions`);
-      console.log("✅ Response:", response.data);
+      console.log("Soal berhasil dimuat:", response.data);
 
       const data = response.data.data;
 
       if (data.session) {
         setSession(data.session);
-        setRemainingSeconds(data.session.remaining_seconds || 0);
         setQuestions(data.questions || []);
         
         const existingAnswers = {};
@@ -111,8 +101,6 @@ export default function CandidateTest() {
         setAnswers(existingAnswers);
       } else if (data.questions) {
         setQuestions(data.questions || []);
-        setRemainingSeconds(data.remaining_seconds || 0);
-        
         const existingAnswers = {};
         data.questions.forEach(q => {
           if (q.selected_option_id) {
@@ -125,17 +113,10 @@ export default function CandidateTest() {
       }
 
     } catch (error) {
-      console.error("❌ Error fetching questions:", error);
-      console.error("❌ Response status:", error.response?.status);
-      console.error("❌ Response data:", error.response?.data);
+      console.error("Error fetching questions:", error);
       
-      if (error.response?.status === 401) {
-        toast.error("Sesi Anda habis, silakan login kembali.");
-        localStorage.removeItem("token");
-        navigate("/login");
-      } else if (error.response?.status === 404) {
-        toast.error(`Session ID ${sessionId} tidak ditemukan. Silakan mulai tes baru.`);
-        setTimeout(() => navigate("/candidate-dashboard"), 2000);
+      if (error.response?.status === 404) {
+        toast.error("Soal tidak ditemukan untuk sesi ini.");
       } else {
         toast.error(error.response?.data?.message || "Gagal memuat soal");
       }
@@ -239,7 +220,7 @@ export default function CandidateTest() {
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <p className="mt-4 text-gray-500">Memuat soal...</p>
+            <p className="mt-4 text-gray-500">Memverifikasi status tes...</p>
           </div>
         </div>
       </CandidateLayout>

@@ -27,7 +27,6 @@ export default function RegisterPage() {
     setError("");
     setIsLoading(true);
 
-    // 1. Validasi Frontend
     if (formData.password !== formData.password_confirmation) {
       setError("Password dan konfirmasi password tidak cocok!");
       setIsLoading(false);
@@ -41,28 +40,21 @@ export default function RegisterPage() {
     }
 
     try {
-      // ================================================================
-      // PERBAIKAN PENTING UNTUK MENGATASI ERROR 422:
-      // Kita kirim field 'role' secara eksplisit agar diterima Backend Laravel.
-      // ================================================================
       const payload = {
         name: formData.name,
         email: formData.email,
         password: formData.password,
         password_confirmation: formData.password_confirmation,
-        role: "candidate", // <--- Tambahkan ini! Backend butuh field ini.
+        role: "candidate",
       };
 
       await register(payload);
-
       alert("✅ Registrasi berhasil! Silakan login.");
       navigate("/login");
     } catch (err) {
       console.log("Error detail:", err);
 
-      // 2. Logic parsing error yang lebih baik untuk 422
       if (err.response?.status === 422) {
-        // Laravel mengirim error validasi di object 'errors'
         if (err.response?.data?.errors) {
           const errorMessages = Object.values(err.response.data.errors).flat();
           setError(errorMessages.join(". "));
@@ -80,81 +72,95 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex flex-col">
+    <div className="min-h-screen flex">
+      
+      {/* ===== LEFT SIDE ===== */}
+      <div className="hidden lg:flex lg:w-1/2 bg-[#0a2142] relative flex-col justify-center px-20 py-16 text-white">
+        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none overflow-hidden">
+          <svg viewBox="0 0 400 400" className="absolute -top-20 -left-20 w-96 h-96 text-white">
+            <circle cx="200" cy="200" r="180" stroke="currentColor" strokeWidth="2" fill="none" />
+            <circle cx="200" cy="200" r="140" stroke="currentColor" strokeWidth="1" fill="none" opacity="0.5" />
+          </svg>
+          <svg viewBox="0 0 400 400" className="absolute -bottom-20 -right-20 w-80 h-80 text-white">
+            <circle cx="200" cy="200" r="180" stroke="currentColor" strokeWidth="2" fill="none" />
+          </svg>
+        </div>
 
-      <header className="flex items-center justify-between px-8 md:px-16 lg:px-24 py-6 md:py-8 flex-shrink-0">
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-blue-900">EduPsych</h1>
-        <Link
-          to="/login"
-          className="text-base md:text-lg font-semibold text-blue-700 hover:text-blue-900 transition"
-        >
-          Sign In
-        </Link>
-      </header>
+        <div className="relative z-10">
+          <h1 className="text-6xl font-bold text-[#d4c28a] mb-20 tracking-wide">EduPsych</h1>
+          
+          <h2 className="text-5xl lg:text-6xl font-bold leading-tight mb-8">
+            Building the Future of<br />
+            Psychological Assessment
+          </h2>
+          <p className="text-xl text-blue-200/90 max-w-lg leading-relaxed font-light">
+            Join thousands of clinical professionals and educational institutions using EduPsych to deliver psychometric precision and actionable insights.
+          </p>
+        </div>
+      </div>
 
-      <div className="flex-1 flex items-center justify-center px-4 md:px-8 py-8 md:py-12">
-        <div 
-          className={`bg-white w-full max-w-4xl lg:max-w-5xl rounded-3xl border border-gray-200 shadow-2xl p-10 md:p-16 lg:p-20 transition-all duration-700 transform ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
+      {/* ===== RIGHT SIDE ===== */}
+      <div className="flex-1 flex items-center justify-center bg-white px-8 py-10 lg:px-16">
+        <div className={`w-full max-w-xl transition-all duration-700 transform ${
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+        }`}>
+          
+          <div className="mb-10 text-left">
+            <h2 className="text-4xl font-bold text-gray-900">Create Account</h2>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 text-red-600 p-4 rounded-xl text-base border-2 border-red-200 whitespace-pre-line mb-6">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
             
-            {/* LEFT SIDE - WELCOME */}
-            <div className="lg:col-span-2">
-              <div className="h-full flex flex-col justify-center">
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                  Create Account
-                </h2>
-                <p className="text-gray-500 mt-4 text-lg md:text-xl leading-relaxed">
-                  Register as a candidate to access psychological assessments and track your progress.
-                </p>
-                
-                <div className="mt-8 hidden lg:block">
-                  <div className="w-16 h-1 bg-green-600 rounded-full mb-4"></div>
-                </div>
-              </div>
+            {/* Nama Lengkap */}
+            <div>
+              <label className="block text-base font-medium text-gray-700 mb-1.5">
+                Nama Lengkap
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="w-full border border-gray-300 rounded-xl px-4 py-4 text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0a2142] focus:border-[#0a2142] transition-all bg-white"
+                placeholder="Nama Lengkap"
+              />
             </div>
 
-            {/* RIGHT SIDE - FORM */}
-            <div className="lg:col-span-3">
+            {/* Email */}
+            <div>
+              <label className="block text-base font-medium text-gray-700 mb-1.5">
+                Alamat Gmail
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full border border-gray-300 rounded-xl px-4 py-4 text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0a2142] focus:border-[#0a2142] transition-all bg-white"
+                placeholder="Nama@Gmail.com"
+              />
+            </div>
 
-              {error && (
-                <div className="bg-red-50 text-red-600 p-4 md:p-5 rounded-xl text-sm md:text-base border-2 border-red-200 whitespace-pre-line mb-4">
-                  {error}
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-
-                <div>
-                  <label className="block text-base md:text-lg font-semibold text-gray-700 mb-2">Full Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full border-2 border-gray-200 rounded-xl px-5 md:px-6 py-4 md:py-5 outline-none text-base md:text-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 bg-gray-50 hover:bg-white"
-                    placeholder="Masukkan nama lengkap"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-base md:text-lg font-semibold text-gray-700 mb-2">Email Address</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full border-2 border-gray-200 rounded-xl px-5 md:px-6 py-4 md:py-5 outline-none text-base md:text-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 bg-gray-50 hover:bg-white"
-                    placeholder="candidate@email.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-base md:text-lg font-semibold text-gray-700 mb-2">Password</label>
+            {/* Password & Confirm Password Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-1.5">
+                  Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
                   <input
                     type="password"
                     name="password"
@@ -162,57 +168,79 @@ export default function RegisterPage() {
                     onChange={handleChange}
                     required
                     minLength={8}
-                    className="w-full border-2 border-gray-200 rounded-xl px-5 md:px-6 py-4 md:py-5 outline-none text-base md:text-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 bg-gray-50 hover:bg-white"
-                    placeholder="Minimal 8 karakter"
+                    className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0a2142] focus:border-[#0a2142] transition-all bg-white"
+                    placeholder="********"
                   />
-                  <p className="text-sm text-gray-400 mt-1">Password minimal 8 karakter</p>
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-base md:text-lg font-semibold text-gray-700 mb-2">Confirm Password</label>
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-1.5">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.543 7a10.01 10.01 0 01-9.543 7c-4.477 0-8.268-2.943-9.543-7z" />
+                    </svg>
+                  </div>
                   <input
                     type="password"
                     name="password_confirmation"
                     value={formData.password_confirmation}
                     onChange={handleChange}
                     required
-                    className="w-full border-2 border-gray-200 rounded-xl px-5 md:px-6 py-4 md:py-5 outline-none text-base md:text-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 bg-gray-50 hover:bg-white"
-                    placeholder="Konfirmasi password"
+                    className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0a2142] focus:border-[#0a2142] transition-all bg-white"
+                    placeholder="********"
                   />
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full py-4 md:py-5 rounded-xl bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold text-lg md:text-xl lg:text-2xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-[1.02] mt-2"
-                >
-                  {isLoading ? (
-                    <span className="flex items-center justify-center gap-3">
-                      <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </span>
-                  ) : (
-                    "Register as Candidate"
-                  )}
-                </button>
-
-              </form>
-
-              <p className="text-center mt-6 text-base md:text-lg text-gray-600">
-                Already have an account?{" "}
-                <Link to="/login" className="text-blue-800 font-semibold hover:underline hover:text-blue-600 transition">
-                  Login here
-                </Link>
-              </p>
-
+              </div>
             </div>
+
+            {/* Persetujuan / Checkbox */}
+            <div className="flex items-start">
+              <input
+                id="terms"
+                type="checkbox"
+                className="h-5 w-5 text-[#0a2142] border-gray-300 rounded focus:ring-[#0a2142] mt-0.5"
+              />
+              <label htmlFor="terms" className="ml-3 block text-base text-gray-600 leading-relaxed">
+                I agree to the <Link to="#" className="text-[#0a2142] hover:underline">Terms of Service</Link> and acknowledge the <Link to="#" className="text-[#0a2142] hover:underline">Privacy Policy</Link> regarding sensitive data handling.
+              </label>
+            </div>
+
+            {/* Register Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-4 px-4 bg-[#0a2142] hover:bg-[#0a2142]/90 text-white text-lg font-semibold rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center mt-2"
+            >
+              {isLoading ? (
+                <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <span className="flex items-center gap-3 text-lg">
+                  Register Account <span>✨</span>
+                </span>
+              )}
+            </button>
+          </form>
+
+          {/* Login Link */}
+          <div className="mt-8 pt-8 border-t border-gray-200 text-center">
+            <p className="text-base text-gray-500">
+              Already have an account?{" "}
+              <Link to="/login" className="text-[#0a2142] font-semibold hover:underline">
+                Log in here
+              </Link>
+            </p>
           </div>
 
-          {/* FOOTER */}
-          <div className="flex flex-wrap justify-center gap-6 md:gap-8 text-sm md:text-base text-gray-400 mt-10 pt-8 border-t border-gray-100">
+          {/* Footer Links */}
+          <div className="mt-8 flex justify-center gap-6 text-sm text-gray-400">
             <button type="button" onClick={() => alert("Privacy Policy")} className="hover:text-gray-600 transition">
               Privacy Policy
             </button>

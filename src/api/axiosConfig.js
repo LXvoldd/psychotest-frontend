@@ -6,7 +6,7 @@ console.log("🔒 [Private API] Mengirim ke:", BASE_URL);
 
 const privateApi = axios.create({
   baseURL: BASE_URL,
-  timeout: 30000,
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

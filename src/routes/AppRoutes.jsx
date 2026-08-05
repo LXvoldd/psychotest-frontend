@@ -11,7 +11,8 @@ import ResultList from "../features/results/ResultList";
 import CandidateTest from "../features/candidate/CandidateTest";
 import TestPackageManager from "../features/admin/test-packages/TestPackageManager";
 import ResultsDashboard from "../features/admin/results/ResultsDashboard";
-import ResultDetail from "../features/admin/results/ResultDetail"; // ✅ TAMBAHAN IMPORT BARU
+import ResultDetail from "../features/admin/results/ResultDetail";
+import CandidateAssignments from "../features/candidate/CandidateAssignments";
 
 const AdminRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -56,11 +57,10 @@ export default function AppRoutes() {
         <Route path="/admin/test-packages/edit/:id" element={<AdminRoute><TestForm /></AdminRoute>} />
 
         <Route path="/results" element={<AdminRoute><ResultsDashboard /></AdminRoute>} />
-        
-        {/* ✅ TAMBAHAN ROUTE DETAIL RESULTS */}
         <Route path="/results/:id" element={<AdminRoute><ResultDetail /></AdminRoute>} />
 
         <Route path="/candidate-dashboard" element={<CandidateRoute><CandidateDashboard /></CandidateRoute>} />
+        <Route path="/candidate/assignments" element={<CandidateRoute><CandidateAssignments /></CandidateRoute>} />
         <Route path="/candidate/test/:sessionId" element={<CandidateRoute><CandidateTest /></CandidateRoute>} />
       </Routes>
     </BrowserRouter>
