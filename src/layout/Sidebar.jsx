@@ -31,7 +31,13 @@ export default function Sidebar() {
                     Test Packages
                 </Link>
 
-                {/* ✅ BAGIAN INI SAYA UBAH: /admin/results menjadi /results */}
+                <Link 
+                    to="/admin/questions" 
+                    className={`px-4 py-3 rounded-lg transition-all duration-200 ${isActive("/admin/questions") ? "bg-blue-600 text-white font-semibold shadow-md" : "text-slate-300 hover:bg-slate-800 hover:text-white"}`}
+                >
+                    Question Bank
+                </Link>
+
                 <Link 
                     to="/results" 
                     className={`px-4 py-3 rounded-lg transition-all duration-200 ${isActive("/results") ? "bg-blue-600 text-white font-semibold shadow-md" : "text-slate-300 hover:bg-slate-800 hover:text-white"}`}

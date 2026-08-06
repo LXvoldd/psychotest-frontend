@@ -108,11 +108,9 @@ export default function CandidateAssignments() {
     );
   }
 
-  // Filter data berdasarkan status
   const activeTests = testPackages.filter(t => t.status !== "completed");
   const historyTests = testPackages.filter(t => t.status === "completed");
 
-  // Filter data berdasarkan pencarian (Search)
   const filterBySearch = (tests) => {
     if (!searchQuery.trim()) return tests;
     const lowerQuery = searchQuery.toLowerCase();
@@ -125,7 +123,6 @@ export default function CandidateAssignments() {
   const filteredActiveTests = filterBySearch(activeTests);
   const filteredHistoryTests = filterBySearch(historyTests);
 
-  // Render kartu tes
   const renderTestCard = (test) => {
     const isCompleted = test.status === "completed";
     const isInProgress = test.status === "in_progress";
@@ -133,7 +130,7 @@ export default function CandidateAssignments() {
     return (
       <div key={test.id} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col h-full">
         
-        {/* Header Kartu */}
+        {}
         <div className="flex items-start justify-between mb-4">
           <div>
             <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full mb-2">
@@ -166,7 +163,7 @@ export default function CandidateAssignments() {
           </div>
         </div>
 
-        {/* Progress Bar (Hanya tampil jika Active) */}
+        {}
         {!isCompleted && (
           <div className="mb-6">
             <div className="flex justify-between text-xs text-gray-500 mb-1">
@@ -182,7 +179,7 @@ export default function CandidateAssignments() {
           </div>
         )}
 
-        {/* Tombol Aksi & Footer (Dipaksa di paling bawah) */}
+        {}
         {isCompleted ? (
           <div className="mt-auto pt-4 border-t border-gray-100">
             <div className="flex justify-end">
@@ -212,7 +209,7 @@ export default function CandidateAssignments() {
     <CandidateLayout>
       <div className="p-6 max-w-7xl mx-auto">
         
-        {/* HEADER HALAMAN + SEARCH BAR */}
+        {}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-slate-800">My Assignments</h1>
@@ -234,7 +231,7 @@ export default function CandidateAssignments() {
           </div>
         </div>
 
-        {/* TAB ACTIVE / HISTORY */}
+        {}
         <div className="flex gap-6 border-b border-gray-200 mb-6">
           <button
             onClick={() => setActiveTab("active")}
@@ -258,7 +255,7 @@ export default function CandidateAssignments() {
           </button>
         </div>
 
-        {/* GRID TES */}
+        {}
         {activeTab === "active" ? (
           filteredActiveTests.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

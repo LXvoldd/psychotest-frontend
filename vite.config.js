@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://main-scientist-moreover-subscribers.trycloudflare.com/api/v1',
+        target: 'https://theatre-underlying-increases-grab.trycloudflare.com/api/v1',
         changeOrigin: true,
       }
     }

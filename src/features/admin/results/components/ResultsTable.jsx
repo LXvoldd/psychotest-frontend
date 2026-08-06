@@ -11,7 +11,7 @@ export default function ResultsTable({ results, loading, onExportPDF }) {
       <EmptyState
         title="Belum Ada Hasil"
         description="Belum ada kandidat yang menyelesaikan tes."
-        icon="📊"
+        icon=""
       />
     );
   }
@@ -23,9 +23,9 @@ export default function ResultsTable({ results, loading, onExportPDF }) {
       expired: "bg-red-100 text-red-700",
     };
     const labels = {
-      completed: "✅ Selesai",
-      in_progress: "⏳ Sedang Berjalan",
-      expired: "⏰ Kadaluarsa",
+      completed: "Selesai",
+      in_progress: "Sedang Berjalan",
+      expired: "Kadaluarsa",
     };
     return (
       <span
@@ -104,7 +104,7 @@ export default function ResultsTable({ results, loading, onExportPDF }) {
                     onClick={() => onExportPDF(result.id)}
                     className="px-3 py-1 text-sm bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition"
                   >
-                    📄 PDF
+                     PDF
                   </button>
                 </td>
               </tr>

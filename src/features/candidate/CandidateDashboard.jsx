@@ -252,7 +252,7 @@ export default function CandidateDashboard() {
             </div>
 
             {testPackages.length > 0 ? (
-              testPackages.slice(0, 4).map((test) => { // <--- TAMBAHKAN .slice(0, 4) DI SINI
+              testPackages.slice(0, 4).map((test) => {
                 const isCompleted = test.status === "completed";
                 const isInProgress = test.status === "in_progress";
 
@@ -299,7 +299,7 @@ export default function CandidateDashboard() {
               </div>
             )}
             
-            {/* Tambahkan tombol "Lihat Semua" jika tes lebih dari 4 */}
+            {}
             {testPackages.length > 4 && (
               <div className="flex justify-center mt-4">
                 <button

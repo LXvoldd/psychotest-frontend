@@ -74,7 +74,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       
-      {/* ===== LEFT SIDE ===== */}
+      {}
       <div className="hidden lg:flex lg:w-1/2 bg-[#0a2142] relative flex-col justify-center px-20 py-16 text-white">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none overflow-hidden">
           <svg viewBox="0 0 400 400" className="absolute -top-20 -left-20 w-96 h-96 text-white">
@@ -100,7 +100,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ===== RIGHT SIDE ===== */}
+      {}
       <div className="flex-1 flex items-center justify-center bg-white px-8 py-10 lg:px-16">
         <div className={`w-full max-w-xl transition-all duration-700 transform ${
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
@@ -113,7 +113,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* LOGIKA ROLE */}
+          {}
           <div className="mb-8">
             <p className="text-base font-medium text-gray-700 mb-3">Select your role</p>
             <div className="grid grid-cols-2 gap-4">
@@ -126,7 +126,7 @@ export default function LoginPage() {
                     : "border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50"
                 }`}
               >
-                👤 Admin
+                 Admin
               </button>
               <button
                 type="button"
@@ -137,14 +137,14 @@ export default function LoginPage() {
                     : "border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50"
                 }`}
               >
-                🎓 Candidate
+                 Candidate
               </button>
             </div>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             
-            {/* Email */}
+            {}
             <div>
               <div className="flex justify-between items-center mb-1.5">
                 <label className="block text-base font-medium text-gray-700">
@@ -166,7 +166,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Password */}
+            {}
             <div>
               <div className="flex justify-between items-center mb-1.5">
                 <label className="block text-base font-medium text-gray-700">
@@ -207,7 +207,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Remember Me */}
+            {}
             <div className="flex items-center mt-2">
               <input
                 id="remember-me"
@@ -219,7 +219,7 @@ export default function LoginPage() {
               </label>
             </div>
 
-            {/* Login Button */}
+            {}
             <button
               type="submit"
               disabled={loading}
@@ -238,7 +238,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Register Link */}
+          {}
           <div className="mt-8 pt-8 border-t border-gray-200 text-center">
             <p className="text-base text-gray-500">
               Don't have an account?{" "}
@@ -248,7 +248,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Footer Links */}
+          {}
           <div className="mt-8 flex justify-center gap-6 text-sm text-gray-400">
             <button type="button" onClick={() => toast("Privacy Policy")} className="hover:text-gray-600 transition">
               Privacy Policy

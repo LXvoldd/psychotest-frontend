@@ -4,7 +4,7 @@ import MainLayout from "../../../layout/MainLayout";
 import api from "../../../api/axiosConfig";
 
 export default function ResultDetail() {
-  const { id } = useParams(); // Ambil ID dari URL (contoh: /results/1)
+  const { id } = useParams();
   const [result, setResult] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,7 +23,7 @@ export default function ResultDetail() {
         }
 
         const response = await api.get(`/admin/results/${id}`);
-        console.log("📊 Result Detail:", response.data);
+        console.log("Result Detail:", response.data);
 
         const data = response.data.data || response.data;
         setResult(data);
@@ -32,7 +32,7 @@ export default function ResultDetail() {
         if (err.response?.status === 401 || err.response?.status === 403) {
           navigate("/login");
         } else {
-          console.error("❌ Error:", err);
+          console.error("Error:", err);
           setError("Gagal memuat detail hasil tes.");
         }
       } finally {
@@ -71,7 +71,6 @@ export default function ResultDetail() {
     );
   }
 
-  // Format tanggal
   const formatDate = (isoString) => {
     if (!isoString) return "-";
     const date = new Date(isoString);
@@ -104,7 +103,7 @@ export default function ResultDetail() {
         </div>
       </div>
 
-      {/* Info Kandidat & Tes */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <h3 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wider text-gray-500">Info Kandidat</h3>
@@ -125,7 +124,7 @@ export default function ResultDetail() {
         </div>
       </div>
 
-      {/* Waktu Pengerjaan */}
+      {}
       <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-8">
         <h3 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wider text-gray-500">Waktu Pengerjaan</h3>
         <div className="flex flex-col sm:flex-row gap-4 text-sm">
@@ -134,7 +133,7 @@ export default function ResultDetail() {
         </div>
       </div>
 
-      {/* Tabel Jawaban */}
+      {}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-8">
         <div className="p-6 border-b border-gray-100">
           <h3 className="font-bold text-lg text-slate-800">Jawaban Per Soal</h3>

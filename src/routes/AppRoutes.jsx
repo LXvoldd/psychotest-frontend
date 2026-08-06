@@ -13,6 +13,7 @@ import TestPackageManager from "../features/admin/test-packages/TestPackageManag
 import ResultsDashboard from "../features/admin/results/ResultsDashboard";
 import ResultDetail from "../features/admin/results/ResultDetail";
 import CandidateAssignments from "../features/candidate/CandidateAssignments";
+import QuestionManager from "../features/admin/questions/QuestionManager";
 
 const AdminRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -55,6 +56,8 @@ export default function AppRoutes() {
         <Route path="/admin/test-packages" element={<AdminRoute><TestPackageManager /></AdminRoute>} />
         <Route path="/admin/test-packages/create" element={<AdminRoute><TestForm /></AdminRoute>} />
         <Route path="/admin/test-packages/edit/:id" element={<AdminRoute><TestForm /></AdminRoute>} />
+
+        <Route path="/admin/questions" element={<AdminRoute><QuestionManager /></AdminRoute>} />
 
         <Route path="/results" element={<AdminRoute><ResultsDashboard /></AdminRoute>} />
         <Route path="/results/:id" element={<AdminRoute><ResultDetail /></AdminRoute>} />

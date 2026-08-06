@@ -49,7 +49,7 @@ export default function RegisterPage() {
       };
 
       await register(payload);
-      alert("✅ Registrasi berhasil! Silakan login.");
+      alert("Registrasi berhasil! Silakan login.");
       navigate("/login");
     } catch (err) {
       console.log("Error detail:", err);
@@ -74,7 +74,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex">
       
-      {/* ===== LEFT SIDE ===== */}
+      {}
       <div className="hidden lg:flex lg:w-1/2 bg-[#0a2142] relative flex-col justify-center px-20 py-16 text-white">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none overflow-hidden">
           <svg viewBox="0 0 400 400" className="absolute -top-20 -left-20 w-96 h-96 text-white">
@@ -99,7 +99,7 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* ===== RIGHT SIDE ===== */}
+      {}
       <div className="flex-1 flex items-center justify-center bg-white px-8 py-10 lg:px-16">
         <div className={`w-full max-w-xl transition-all duration-700 transform ${
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
@@ -117,7 +117,7 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             
-            {/* Nama Lengkap */}
+            {}
             <div>
               <label className="block text-base font-medium text-gray-700 mb-1.5">
                 Nama Lengkap
@@ -133,7 +133,7 @@ export default function RegisterPage() {
               />
             </div>
 
-            {/* Email */}
+            {}
             <div>
               <label className="block text-base font-medium text-gray-700 mb-1.5">
                 Alamat Gmail
@@ -149,7 +149,7 @@ export default function RegisterPage() {
               />
             </div>
 
-            {/* Password & Confirm Password Grid */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className="block text-base font-medium text-gray-700 mb-1.5">
@@ -198,7 +198,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Persetujuan / Checkbox */}
+            {}
             <div className="flex items-start">
               <input
                 id="terms"
@@ -210,7 +210,7 @@ export default function RegisterPage() {
               </label>
             </div>
 
-            {/* Register Button */}
+            {}
             <button
               type="submit"
               disabled={isLoading}
@@ -229,7 +229,7 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          {/* Login Link */}
+          {}
           <div className="mt-8 pt-8 border-t border-gray-200 text-center">
             <p className="text-base text-gray-500">
               Already have an account?{" "}
@@ -239,7 +239,7 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          {/* Footer Links */}
+          {}
           <div className="mt-8 flex justify-center gap-6 text-sm text-gray-400">
             <button type="button" onClick={() => alert("Privacy Policy")} className="hover:text-gray-600 transition">
               Privacy Policy

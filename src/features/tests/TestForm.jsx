@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import MainLayout from "../../layout/MainLayout"; // PATH BENAR (2 turun)
+import MainLayout from "../../layout/MainLayout";
 import toast from "react-hot-toast";
 import api from "../../api/axiosConfig";
 
@@ -15,13 +15,8 @@ export default function TestForm() {
   const [submitting, setSubmitting] = useState(false);
 
   const getPackage = async (packageId) => {
-    try {
-      const response = await api.get(`/admin/test-packages/${packageId}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching package:", error);
-      throw error;
-    }
+    const response = await api.get(`/admin/test-packages/${packageId}`);
+    return response.data;
   };
 
   const createPackage = async (data) => {
@@ -59,7 +54,6 @@ export default function TestForm() {
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
 
-    // Convert angka yang dikirim sebagai string menjadi number
     const payload = {
       title: data.title,
       description: data.description,
@@ -88,7 +82,6 @@ export default function TestForm() {
     navigate("/admin/test-packages");
   };
 
-  // Loading State
   if (fetching) {
     return (
       <MainLayout>
@@ -113,7 +106,6 @@ export default function TestForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           
-          {/* Title */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">
               Judul Tes <span className="text-red-500">*</span>
@@ -128,7 +120,6 @@ export default function TestForm() {
             />
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">
               Deskripsi Tes
@@ -142,7 +133,6 @@ export default function TestForm() {
             />
           </div>
 
-          {/* Duration & Passing Score */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">
@@ -174,7 +164,6 @@ export default function TestForm() {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-6">
             <button 
               type="button" 

@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom"; // Tambahkan Link
+import { useNavigate, Link } from "react-router-dom";
 import MainLayout from "../../../layout/MainLayout";
 import api from "../../../api/axiosConfig";
 
 export default function ResultsDashboard() {
   const [results, setResults] = useState([]);
-  const [testPackages, setTestPackages] = useState([]); // Untuk dropdown filter
+  const [testPackages, setTestPackages] = useState([]);
   
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // State untuk Filter & Pagination
   const [filters, setFilters] = useState({
     test_package_id: "",
     per_page: 10,
@@ -23,7 +22,6 @@ export default function ResultsDashboard() {
     total: 0
   });
 
-  // Fungsi mengambil data results
   const fetchResults = async () => {
     try {
       setIsLoading(true);
@@ -35,7 +33,6 @@ export default function ResultsDashboard() {
         return;
       }
 
-      // Buat query string untuk filter & pagination
       const params = new URLSearchParams();
       if (filters.test_package_id) params.append("test_package_id", filters.test_package_id);
       params.append("per_page", filters.per_page);
@@ -46,11 +43,9 @@ export default function ResultsDashboard() {
 
       const rawData = response.data.data || response.data;
       
-      // Ambil data results dan pagination
       const resultsArray = rawData.results || rawData.data || [];
       setResults(Array.isArray(resultsArray) ? resultsArray : []);
       
-      // Simpan data pagination
       if (rawData.pagination) {
         setPagination(rawData.pagination);
       }
@@ -61,7 +56,7 @@ export default function ResultsDashboard() {
         localStorage.removeItem("user");
         navigate("/login");
       } else {
-        console.error("❌ Error:", err);
+        console.error("Error:", err);
         setError("Gagal memuat data hasil tes.");
       }
     } finally {
@@ -69,7 +64,6 @@ export default function ResultsDashboard() {
     }
   };
 
-  // Fungsi mengambil list tes untuk dropdown filter
   const fetchTestPackages = async () => {
     try {
       const response = await api.get("/tests");
@@ -89,19 +83,16 @@ export default function ResultsDashboard() {
     fetchResults();
   }, [filters.test_package_id, filters.page]);
 
-  // Format tanggal Indonesia
   const formatDate = (isoString) => {
     if (!isoString) return "-";
     const date = new Date(isoString);
     return date.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
   };
 
-  // Handle ganti filter
   const handleFilterChange = (e) => {
     setFilters(prev => ({ ...prev, test_package_id: e.target.value, page: 1 }));
   };
 
-  // Handle ganti halaman
   const goToPage = (page) => {
     if (page >= 1 && page <= pagination.last_page) {
       setFilters(prev => ({ ...prev, page }));
@@ -131,7 +122,7 @@ export default function ResultsDashboard() {
         </div>
       )}
 
-      {/* Filter Section */}
+      {}
       <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-6 flex flex-col sm:flex-row gap-4 items-end">
         <div className="w-full sm:w-64">
           <label className="block text-xs font-semibold text-gray-600 mb-1">Filter by Test</label>
@@ -148,7 +139,7 @@ export default function ResultsDashboard() {
         </div>
       </div>
 
-      {/* Table Section */}
+      {}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
@@ -174,7 +165,6 @@ export default function ResultsDashboard() {
                 </tr>
               ) : (
                 results.map((result, index) => {
-                  // Hitung nomor urut berdasarkan halaman
                   const no = ((pagination.current_page - 1) * pagination.per_page) + (index + 1);
 
                   return (
@@ -224,7 +214,7 @@ export default function ResultsDashboard() {
         </div>
       </div>
 
-      {/* Pagination Section */}
+      {}
       {pagination.last_page > 1 && (
         <div className="flex justify-between items-center mt-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
           <p className="text-xs text-gray-500">

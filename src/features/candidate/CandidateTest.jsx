@@ -54,7 +54,7 @@ export default function CandidateTest() {
       const statusData = statusRes.data.data;
 
       if (statusData.status === "completed" || statusData.status === "expired") {
-        toast("Tes ini sudah selesai atau kadaluarsa."); // PERBAIKAN 1
+        toast("Tes ini sudah selesai atau kadaluarsa.");
         navigate("/candidate-dashboard");
         return;
       }

@@ -14,7 +14,7 @@ export default function TestPackageList({ packages, loading, onEdit, onDelete, o
       <EmptyState
         title="Belum Ada Paket Tes"
         description="Mulai buat paket tes pertama untuk kandidat."
-        icon="📝"
+        icon=""
         actionText="Buat Paket Tes"
         onAction={onCreate}
       />
@@ -34,8 +34,8 @@ export default function TestPackageList({ packages, loading, onEdit, onDelete, o
               <p className="text-gray-500 text-sm mt-1">{pkg.description}</p>
               <div className="flex flex-wrap gap-4 mt-2 text-sm">
                 <span className="text-gray-400">⏱ {pkg.duration_minutes} Menit</span>
-                <span className="text-gray-400">🎯 Passing: {pkg.passing_score}%</span>
-                <span className="text-gray-400">📊 {pkg.questions?.length || 0} Soal</span>
+                <span className="text-gray-400"> Passing: {pkg.passing_score}%</span>
+                <span className="text-gray-400"> {pkg.questions?.length || 0} Soal</span>
               </div>
             </div>
 

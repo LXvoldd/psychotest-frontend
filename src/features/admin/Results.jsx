@@ -15,18 +15,15 @@ export default function Results() {
         setIsLoading(true);
         setError(null);
 
-        // Cek login
         const userData = localStorage.getItem("user");
         if (!userData) {
           navigate("/login");
           return;
         }
 
-        // Panggil endpoint untuk mengambil semua hasil tes
         const response = await api.get("/admin/results");
         console.log("📊 Semua Results:", response.data);
 
-        // Handle struktur data (bisa langsung array atau terbungkus)
         const rawData = response.data.data || response.data;
         let resultsArray = [];
 
@@ -41,7 +38,7 @@ export default function Results() {
         setResults(resultsArray);
 
       } catch (err) {
-        console.error("❌ Error mengambil results:", err);
+        console.error("Error mengambil results:", err);
         setError("Gagal memuat data hasil tes.");
       } finally {
         setIsLoading(false);
@@ -96,7 +93,6 @@ export default function Results() {
                 </tr>
               ) : (
                 results.map((result, index) => {
-                  // Logic Status Badge
                   let statusColor = "bg-gray-100 text-gray-500";
                   let statusLabel = "NOT STARTED";
                   if (result.status === "completed" || result.status === "passed") {

@@ -33,11 +33,9 @@ export default function Dashboard() {
           return;
         }
 
-        // 1. Ambil Statistik Dashboard dari API
         const dashboardRes = await api.get("/admin/results");
         const dashboardData = dashboardRes.data.data || dashboardRes.data;
         
-        // PERBAIKAN: Ambil dari object 'summary' sesuai API terbaru
         const summary = dashboardData.summary || {};
         setStats({
           tests: summary.tests_in_progress || 0,
@@ -45,7 +43,6 @@ export default function Dashboard() {
           students: summary.total_candidates || 0
         });
 
-        // 2. Ambil Data Results (Untuk Tabel Latest Test Results)
         const resultsRes = await api.get("/admin/results");
         const rawData = resultsRes.data.data || resultsRes.data;
         
@@ -60,7 +57,7 @@ export default function Dashboard() {
         setRecentResults(resultsArray);
 
       } catch (error) {
-        console.error("❌ Gagal mengambil data dashboard:", error);
+        console.error("Gagal mengambil data dashboard:", error);
       } finally {
         setIsLoading(false);
       }
